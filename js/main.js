@@ -1,14 +1,5 @@
-const UI = {
-    NAV: document.getElementsByClassName('nav_btn'),
-    DISPLAY: document.getElementsByClassName('weather_info_item'),
-    INPUT: document.querySelector('input'),
-    FORM: document.querySelector('form'),
-    TEMPERATURE: document.getElementsByClassName('weather_temp'),
-    ICON: document.getElementsByClassName('weather_icon'),
-    LOCATION: document.getElementsByClassName('location')
-}
-
-    const serverUrl = 'http://api.openweathermap.org/data/2.5/weather';
+import {UI} from "./view.js";
+const serverUrl = 'http://api.openweathermap.org/data/2.5/weather';
 const apiKey = 'f660a2fb1e4bad108d6160b7f58c555f';
 
 
@@ -34,24 +25,22 @@ UI.FORM.addEventListener('submit', event => {
     const url = `${serverUrl}?q=${cityName}&appid=${apiKey}&units=metric`;
     fetch(url)
         .then(response => {
-            if (response.status === 404) {
-                alert('unknown city');
-                return
-            } else {    
+            if (response.ok) {
                 return response.json();
+            } else {
+                throw new Error;
             }
         })
-        .catch(err => alert(err))
         .then(result=> {
             changeWeatherTemperature(result);
             changeWeatherIcon(result);
             changeLocation(result);
         })
+        .catch(err => alert(err))
 })
-
 function changeWeatherTemperature(result) {
     const weatherTemperature = Math.round(result.main.temp);
-    for (item of UI.TEMPERATURE){
+    for (let item of UI.TEMPERATURE){
         item.textContent = `${weatherTemperature}°`;
     }
 }
@@ -59,14 +48,14 @@ function changeWeatherTemperature(result) {
 function changeWeatherIcon(result){
     const weatherIconName = result.weather[0].icon
     const weatherIconUrl = `https://openweathermap.org/img/wn/${weatherIconName}@4x.png`
-    for (item of UI.ICON){
+    for (let item of UI.ICON){
         item.setAttribute('src', weatherIconUrl);
     }
 }
 
 function changeLocation(result) {
     const location = result.name;
-    for (item of UI.LOCATION){
+    for (let item of UI.LOCATION){
         item.textContent = location;
     }
 }
