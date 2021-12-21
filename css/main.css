@@ -4,6 +4,10 @@
     font-size: 24px;
 }
 
+:focus-visible{
+    outline: none;
+}
+
 .wrapper {
     width: 621px;
     margin: auto;
@@ -27,10 +31,9 @@
     font-size: 18px;
 }
 
-#search input:focus-visible, #search input:active, #search input {
+ #search input {
     border: none;
-    outline: none;
-}
+    }
 
 #search_icon {
     position: absolute;
@@ -91,6 +94,7 @@
     right: 26px;
     background: none;
     border: none;
+    cursor: pointer;
 }
 
 #weather_nav {
@@ -136,7 +140,23 @@
 
 .list_item {
     margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    width: 250px;
 }
+
+.list_title, .list_close{
+    cursor: pointer;
+}
+.list_close{
+    display: none;
+    font-size: 21px;
+}
+
+.list_item:hover .list_close{
+    display: inline-block;
+}
+
 
 .weather_parameters {
     margin-top: 40px;
