@@ -1,3 +1,4 @@
+
 function setCurrentCity(cityName) {
     localStorage.setItem('currentCity', JSON.stringify(cityName))
 

@@ -1,4 +1,3 @@
-'use strict'
 import {UI} from "./view.js";
 import storage from "./storage.js";
 
