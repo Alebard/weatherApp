@@ -1,3 +1,5 @@
+'use strict'
+
 export const UI = {
     NAV: document.getElementsByClassName('nav_btn'),
     DISPLAY: document.getElementsByClassName('weather_info_item'),
