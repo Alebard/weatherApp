@@ -195,12 +195,21 @@
 }
 
 .forecast_weather__image {
-    margin: 0;
+    margin: 0 auto;
+    width: 31px;
+    height: 31px;
+    display: block;
+    background-size: 130%;
+    background-position: center;
 }
 
 .forecast_weather__image svg {
     width: 31px;
     height: 31px;
+}
+
+.forecast_status{
+    text-align: center;
 }
 
 .active-screen{

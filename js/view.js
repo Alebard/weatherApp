@@ -14,4 +14,5 @@ export const UI = {
     WEATHER: document.getElementsByClassName('parameters_weather'),
     SUNRISE: document.getElementById('parameters_sunrise'),
     SUNSET: document.getElementById('parameters_sunset'),
+    FORECASTS: document.getElementById('forecasts'),
 }

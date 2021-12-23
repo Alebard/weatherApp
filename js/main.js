@@ -1,10 +1,11 @@
 'use strict'
 
 import {UI} from "./view.js";
-import  storage from "./storage.js";
+import storage from "./storage.js";
 
 const serverUrl = 'https://api.openweathermap.org/data/2.5/weather';
 const apiKey = 'f660a2fb1e4bad108d6160b7f58c555f';
+const serverForecastUrl = 'https://api.openweathermap.org/data/2.5/forecast';
 const locationsArr = storage.getFavoriteCities() ? storage.getFavoriteCities() : [];
 const currentCity = storage.getCurrentCity() ? storage.getCurrentCity() : [];
 currentCity.length > 0 ? getData(currentCity) : getData('Dubai');
@@ -29,9 +30,10 @@ function switchScreen(i) {
 UI.FORM.addEventListener('submit', getData);
 
 function getData(city) {
-    const cityIsString = typeof (city) === "string";
+    const cityIsString = (typeof (city) === "string");
     let cityName = cityIsString ? city : UI.INPUT.value;
     const url = `${serverUrl}?q=${cityName}&appid=${apiKey}&units=metric`;
+    const urlForecast = `${serverForecastUrl}?q=${cityName}&appid=${apiKey}&units=metric`
     fetch(url)
         .then(response => {
             if (response.ok) {
@@ -45,6 +47,54 @@ function getData(city) {
 
         })
         .catch(err => alert(err))
+
+    fetch(urlForecast)
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error;
+            }
+        })
+        .then(result => {
+            addForecasts(result)
+        })
+        .catch(err => alert(err))
+}
+
+
+function addForecasts(result) {
+    const forecasts = result.list;
+    forecasts.forEach(function (item) {
+        const forecast = createForecast(item);
+        UI.FORECASTS.append(forecast);
+    })
+}
+
+
+function createForecast(item) {
+    const weatherDt = item.dt;
+    const temp = Math.round( item.main.temp);
+    const feelsLike = Math.round(item.main.feels_like);
+    const weatherStatus = item.weather[0].main;
+    const weatherIcon = item.weather[0].icon;
+    const forecast = document.createElement('div');
+    forecast.className = 'forecast_item';
+    forecast.innerHTML = `<div class="forecast_date-and-time"> 
+            <div class="forecast_date">${weatherDt}</div> 
+            <div class="forecast_time">${weatherDt}</div> 
+        </div> 
+        <div class="forecast_info"> 
+            <div class="forecast_param">
+                <div>Temperature: <span class="weather_temp parameters_temp">${temp}°</span></div>
+                <div>Feels like: <span class="parameters_feels-like">${feelsLike}°</span></div>
+            </div>
+            <div class="forecast_status">   
+                <span class="parameters_weather">${weatherStatus}</span>
+                <div class="weather_img forecast_weather__image" style="background-image: url(https://openweathermap.org/img/wn/${weatherIcon}@4x.png)"></div>
+            </div>
+        </div>`
+    return forecast
 }
 
 function changeView(result) {
@@ -61,12 +111,13 @@ function changeSunrise(result) {
     const sunriseTime = result.sys.sunrise;
     UI.SUNRISE.textContent = sunriseTime;
 }
+
 function changeSunset(result) {
     const sunsetTime = result.sys.sunset;
     UI.SUNSET.textContent = sunsetTime;
 }
 
-function changeWeatherStatus(result)     {
+function changeWeatherStatus(result) {
     const weatherStatus = result.weather[0].main;
     for (let item of UI.WEATHER) {
         item.textContent = weatherStatus
@@ -125,7 +176,7 @@ function addToFavorites(location) {
     closeLocation.innerHTML = '&#10006';
     list_items.append(newLocation);
     newLocation.append(closeLocation)
-    if (!locationsArr.includes(location)){
+    if (!locationsArr.includes(location)) {
         locationsArr.push(location)
     }
     UI.FORM.reset();
@@ -151,10 +202,9 @@ function deleteLocation(location) {
 }
 
 
-
 function addFavoriteCitiesFromStorage() {
     locationsArr.forEach(function (item) {
-            addToFavorites(item)
+        addToFavorites(item)
     })
 
 }
