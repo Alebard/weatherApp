@@ -7,6 +7,7 @@ const serverUrl = 'https://api.openweathermap.org/data/2.5/weather';
 const apiKey = 'f660a2fb1e4bad108d6160b7f58c555f';
 const serverForecastUrl = 'https://api.openweathermap.org/data/2.5/forecast';
 const locationsArr = storage.getFavoriteCities() ? storage.getFavoriteCities() : [];
+// const locationsArr = JSON.parse(localStorage.getItem('favoriteCities'));
 const currentCity = storage.getCurrentCity() ? storage.getCurrentCity() : [];
 currentCity.length > 0 ? getData(currentCity) : getData('Dubai');
 
@@ -198,7 +199,7 @@ function deleteLocation(location) {
     const index = locationsArr.indexOf(location);
     locationsArr.splice(index, 1);
     this.parentElement.remove();
-    storage.setFavoriteCities()
+    storage.setFavoriteCities(locationsArr)
 }
 
 
