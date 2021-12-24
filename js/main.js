@@ -7,7 +7,6 @@ const serverUrl = 'https://api.openweathermap.org/data/2.5/weather';
 const apiKey = 'f660a2fb1e4bad108d6160b7f58c555f';
 const serverForecastUrl = 'https://api.openweathermap.org/data/2.5/forecast';
 const locationsArr = storage.getFavoriteCities() ? storage.getFavoriteCities() : [];
-// const locationsArr = JSON.parse(localStorage.getItem('favoriteCities'));
 const currentCity = storage.getCurrentCity() ? storage.getCurrentCity() : [];
 currentCity.length > 0 ? getData(currentCity) : getData('Dubai');
 
@@ -74,7 +73,12 @@ function addForecasts(result) {
 
 
 function createForecast(item) {
-    const weatherDt = item.dt;
+
+    const date = timeConvert(item.dt);
+    const weatherHour = date.hour
+    const weatherMinutes = date.minutes
+    const weatherDay = date.day
+    const weatherMonth = date.month
     const temp = Math.round( item.main.temp);
     const feelsLike = Math.round(item.main.feels_like);
     const weatherStatus = item.weather[0].main;
@@ -82,8 +86,8 @@ function createForecast(item) {
     const forecast = document.createElement('div');
     forecast.className = 'forecast_item';
     forecast.innerHTML = `<div class="forecast_date-and-time"> 
-            <div class="forecast_date">${weatherDt}</div> 
-            <div class="forecast_time">${weatherDt}</div> 
+            <div class="forecast_date">${weatherDay} ${weatherMonth}</div> 
+            <div class="forecast_time">${weatherHour}:${weatherMinutes}</div> 
         </div> 
         <div class="forecast_info"> 
             <div class="forecast_param">
@@ -109,13 +113,14 @@ function changeView(result) {
 }
 
 function changeSunrise(result) {
-    const sunriseTime = result.sys.sunrise;
-    UI.SUNRISE.textContent = sunriseTime;
+    const date = timeConvert(result.sys.sunrise);
+    UI.SUNRISE.textContent = `${date.hour}:${date.minutes}`;
 }
 
 function changeSunset(result) {
-    const sunsetTime = result.sys.sunset;
-    UI.SUNSET.textContent = sunsetTime;
+    const date = timeConvert(result.sys.sunset);
+
+    UI.SUNSET.textContent = `${date.hour}:${date.minutes}`;
 }
 
 function changeWeatherStatus(result) {
@@ -212,3 +217,20 @@ function addFavoriteCitiesFromStorage() {
 
 
 addFavoriteCitiesFromStorage()
+
+function timeConvert (unixTime){
+    const date = new Date(unixTime * 1000)
+    const dateParametrs = {
+        day: date.toLocaleString('en-US', {day: "numeric"}),
+        month: date.toLocaleString('en-US', {month: "short"}),
+        hour: dateLengthCheck(date.getHours()),
+        minutes: dateLengthCheck(date.getMinutes()),
+    }
+    return dateParametrs
+}
+
+function dateLengthCheck(checkDate){
+    let date;
+    (checkDate < 10) ? date = `0${checkDate}` : date = checkDate;
+    return date
+}
