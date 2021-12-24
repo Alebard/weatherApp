@@ -3,11 +3,13 @@
 import {UI} from "./view.js";
 import storage from "./storage.js";
 
-const serverUrl = 'https://api.openweathermap.org/data/2.5/weather';
-const apiKey = 'f660a2fb1e4bad108d6160b7f58c555f';
+const serverWeatherData = 'https://api.openweathermap.org/data/2.5/weather';
 const serverForecastUrl = 'https://api.openweathermap.org/data/2.5/forecast';
+const apiKey = 'f660a2fb1e4bad108d6160b7f58c555f';
+
 const locationsArr = storage.getFavoriteCities() ? storage.getFavoriteCities() : [];
 const currentCity = storage.getCurrentCity() ? storage.getCurrentCity() : [];
+
 currentCity.length > 0 ? getData(currentCity) : getData('Dubai');
 
 for (let i = 0; i < UI.NAV.length; i++) {
@@ -17,7 +19,7 @@ for (let i = 0; i < UI.NAV.length; i++) {
 }
 
 function switchScreen(i) {
-    for (screen of UI.DISPLAY) {
+    for (let screen of UI.DISPLAY) {
         screen.classList.remove('active-screen');
     }
     UI.DISPLAY[i].classList.add('active-screen');
@@ -30,9 +32,9 @@ function switchScreen(i) {
 UI.FORM.addEventListener('submit', getData);
 
 function getData(city) {
-    const cityIsString = (typeof (city) === "string");
-    let cityName = cityIsString ? city : UI.INPUT.value;
-    const url = `${serverUrl}?q=${cityName}&appid=${apiKey}&units=metric`;
+    const isCityTypeString = (typeof (city) === "string");
+    const cityName = isCityTypeString ? city : UI.INPUT.value;
+    const url = `${serverWeatherData}?q=${cityName}&appid=${apiKey}&units=metric`;
     const urlForecast = `${serverForecastUrl}?q=${cityName}&appid=${apiKey}&units=metric`
     fetch(url)
         .then(response => {
@@ -46,7 +48,7 @@ function getData(city) {
             changeView(result)
 
         })
-        .catch(err => alert(err))
+        .catch(alert)
 
     fetch(urlForecast)
         .then(response => {
@@ -59,47 +61,7 @@ function getData(city) {
         .then(result => {
             addForecasts(result)
         })
-        .catch(err => alert(err))
-}
-
-
-function addForecasts(result) {
-    const forecasts = result.list;
-    forecasts.forEach(function (item) {
-        const forecast = createForecast(item);
-        UI.FORECASTS.append(forecast);
-    })
-}
-
-
-function createForecast(item) {
-
-    const date = timeConvert(item.dt);
-    const weatherHour = date.hour
-    const weatherMinutes = date.minutes
-    const weatherDay = date.day
-    const weatherMonth = date.month
-    const temp = Math.round( item.main.temp);
-    const feelsLike = Math.round(item.main.feels_like);
-    const weatherStatus = item.weather[0].main;
-    const weatherIcon = item.weather[0].icon;
-    const forecast = document.createElement('div');
-    forecast.className = 'forecast_item';
-    forecast.innerHTML = `<div class="forecast_date-and-time"> 
-            <div class="forecast_date">${weatherDay} ${weatherMonth}</div> 
-            <div class="forecast_time">${weatherHour}:${weatherMinutes}</div> 
-        </div> 
-        <div class="forecast_info"> 
-            <div class="forecast_param">
-                <div>Temperature: <span class="weather_temp parameters_temp">${temp}°</span></div>
-                <div>Feels like: <span class="parameters_feels-like">${feelsLike}°</span></div>
-            </div>
-            <div class="forecast_status">   
-                <span class="parameters_weather">${weatherStatus}</span>
-                <div class="weather_img forecast_weather__image" style="background-image: url(https://openweathermap.org/img/wn/${weatherIcon}@4x.png)"></div>
-            </div>
-        </div>`
-    return forecast
+        .catch(alert)
 }
 
 function changeView(result) {
@@ -130,7 +92,6 @@ function changeWeatherStatus(result) {
     }
 }
 
-
 function changeFeelsLike(result) {
     const feelsLike = Math.round(result.main.feels_like);
     for (let item of UI.FEELS_LIKE) {
@@ -159,6 +120,36 @@ function changeLocation(result) {
         item.textContent = location;
     }
     storage.setCurrentCity(location)
+}
+
+
+function createForecast(item) {
+    const date = timeConvert(item.dt);
+    const weatherHour = date.hour
+    const weatherMinutes = date.minutes
+    const weatherDay = date.day
+    const weatherMonth = date.month
+    const temp = Math.round( item.main.temp);
+    const feelsLike = Math.round(item.main.feels_like);
+    const weatherStatus = item.weather[0].main;
+    const weatherIcon = item.weather[0].icon;
+    const forecast = document.createElement('div');
+    forecast.className = 'forecast_item';
+    forecast.innerHTML = `<div class="forecast_date-and-time"> 
+            <div class="forecast_date">${weatherDay} ${weatherMonth}</div> 
+            <div class="forecast_time">${weatherHour}:${weatherMinutes}</div> 
+        </div> 
+        <div class="forecast_info"> 
+            <div class="forecast_param">
+                <div>Temperature: <span class="weather_temp parameters_temp">${temp}°</span></div>
+                <div>Feels like: <span class="parameters_feels-like">${feelsLike}°</span></div>
+            </div>
+            <div class="forecast_status">   
+                <span class="parameters_weather">${weatherStatus}</span>
+                <div class="weather_img forecast_weather__image" style="background-image: url(https://openweathermap.org/img/wn/${weatherIcon}@4x.png)"></div>
+            </div>
+        </div>`
+    return forecast
 }
 
 UI.ADD_TO_FAVORITES.addEventListener('click', addToFavoritesFromNow);
@@ -207,16 +198,12 @@ function deleteLocation(location) {
     storage.setFavoriteCities(locationsArr)
 }
 
-
 function addFavoriteCitiesFromStorage() {
     locationsArr.forEach(function (item) {
         addToFavorites(item)
     })
 
 }
-
-
-addFavoriteCitiesFromStorage()
 
 function timeConvert (unixTime){
     const date = new Date(unixTime * 1000)
@@ -234,3 +221,13 @@ function dateLengthCheck(checkDate){
     (checkDate < 10) ? date = `0${checkDate}` : date = checkDate;
     return date
 }
+
+function addForecasts(result) {
+    const forecasts = result.list;
+    forecasts.forEach(function (item) {
+        const forecast = createForecast(item);
+        UI.FORECASTS.append(forecast);
+    })
+}
+
+addFavoriteCitiesFromStorage()
