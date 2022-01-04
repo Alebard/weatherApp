@@ -12,21 +12,24 @@ const currentCity = storage.getCurrentCity() ? storage.getCurrentCity() : [];
 
 currentCity.length > 0 ? getData(currentCity) : getData('Dubai');
 
-for (let i = 0; i < UI.NAV.length; i++) {
-    UI.NAV[i].addEventListener('click', function () {
-        switchScreen(i);
-    })
+
+UI.NAV_BTNS.forEach(function (item, index) {
+    item.addEventListener('click', switchScreen(index))
+})
+
+function switchScreen(index) {
+    return function () {
+        removeClassName(UI.DISPLAY, 'active-screen');
+        removeClassName(UI.NAV_BTNS, 'active-btn');
+        UI.DISPLAY[index].classList.add('active-screen');
+        UI.NAV_BTNS[index].classList.add('active-btn');
+    }
 }
 
-function switchScreen(i) {
-    for (let screen of UI.DISPLAY) {
-        screen.classList.remove('active-screen');
-    }
-    UI.DISPLAY[i].classList.add('active-screen');
-    for (let btn of UI.NAV) {
-        btn.classList.remove('active-btn');
-    }
-    UI.NAV[i].classList.add('active-btn');
+function removeClassName (array, className){
+   array.forEach(function (item) {
+        item.classList.remove(className);
+    })
 }
 
 UI.FORM.addEventListener('submit', getData);
@@ -81,44 +84,43 @@ function changeSunrise(result) {
 
 function changeSunset(result) {
     const date = timeConvert(result.sys.sunset);
-
     UI.SUNSET.textContent = `${date.hour}:${date.minutes}`;
 }
 
 function changeWeatherStatus(result) {
     const weatherStatus = result.weather[0].main;
-    for (let item of UI.WEATHER) {
+    UI.WEATHER.forEach(function (item) {
         item.textContent = weatherStatus
-    }
+    })
 }
 
 function changeFeelsLike(result) {
     const feelsLike = Math.round(result.main.feels_like);
-    for (let item of UI.FEELS_LIKE) {
+    UI.FEELS_LIKE.forEach(function (item) {
         item.textContent = `${feelsLike}°`;
-    }
+    })
 }
 
 function changeWeatherTemperature(result) {
     const weatherTemperature = Math.round(result.main.temp);
-    for (let item of UI.TEMPERATURE) {
+    UI.TEMPERATURE.forEach(function (item) {
         item.textContent = `${weatherTemperature}°`;
-    }
+    })
 }
 
 function changeWeatherIcon(result) {
     const weatherIconName = result.weather[0].icon
     const weatherIconUrl = `https://openweathermap.org/img/wn/${weatherIconName}@4x.png`
-    for (let item of UI.ICON) {
+    UI.ICON.forEach(function (item) {
         item.setAttribute('src', weatherIconUrl);
-    }
+    })
 }
 
 function changeLocation(result) {
     const location = result.name;
-    for (let item of UI.LOCATION) {
+    UI.LOCATION.forEach(function (item) {
         item.textContent = location;
-    }
+    })
     storage.setCurrentCity(location)
 }
 
@@ -129,7 +131,7 @@ function createForecast(item) {
     const weatherMinutes = date.minutes
     const weatherDay = date.day
     const weatherMonth = date.month
-    const temp = Math.round( item.main.temp);
+    const temp = Math.round(item.main.temp);
     const feelsLike = Math.round(item.main.feels_like);
     const weatherStatus = item.weather[0].main;
     const weatherIcon = item.weather[0].icon;
@@ -205,7 +207,7 @@ function addFavoriteCitiesFromStorage() {
 
 }
 
-function timeConvert (unixTime){
+function timeConvert(unixTime) {
     const date = new Date(unixTime * 1000)
     const dateParametrs = {
         day: date.toLocaleString('en-US', {day: "numeric"}),
@@ -216,13 +218,14 @@ function timeConvert (unixTime){
     return dateParametrs
 }
 
-function dateLengthCheck(checkDate){
+function dateLengthCheck(checkDate) {
     let date;
     (checkDate < 10) ? date = `0${checkDate}` : date = checkDate;
     return date
 }
 
 function addForecasts(result) {
+    removeForecasts();
     const forecasts = result.list;
     forecasts.forEach(function (item) {
         const forecast = createForecast(item);
@@ -230,4 +233,8 @@ function addForecasts(result) {
     })
 }
 
-addFavoriteCitiesFromStorage()
+function removeForecasts(){
+    UI.FORECASTS.innerHTML = '';
+}
+
+addFavoriteCitiesFromStorage();
