@@ -6,7 +6,9 @@ function setCurrentCity(cityName) {
 }
 
 function getCurrentCity() {
-    return JSON.parse(localStorage.getItem('currentCity'))
+    const jsonCurrentCity = JSON.parse(localStorage.getItem('currentCity'));
+    const currentCity = jsonCurrentCity? jsonCurrentCity: 'Dubai';
+    return currentCity
 }
 
 function setFavouriteCities(favouriteCitesNames) {
@@ -20,7 +22,5 @@ function getFavouriteCities() {
 }
 
 
-const defaultCityName = 'Dubai';
-const currentCity = getCurrentCity() ? getCurrentCity() : defaultCityName;
 
-export default {setCurrentCity, setFavouriteCities, getFavouriteCities, currentCity}
+export default {setCurrentCity, setFavouriteCities, getFavouriteCities, getCurrentCity}
