@@ -1,4 +1,5 @@
 'use strict'
+
 function setCurrentCity(cityName) {
     localStorage.setItem('currentCity', JSON.stringify(cityName))
 
@@ -8,12 +9,18 @@ function getCurrentCity() {
     return JSON.parse(localStorage.getItem('currentCity'))
 }
 
-function setFavoriteCities(locationsArr) {
-    localStorage.setItem('favoriteCities', JSON.stringify(locationsArr))
+function setFavouriteCities(favouriteCitesNames) {
+    localStorage.setItem('favouriteCities', JSON.stringify([...favouriteCitesNames]))
 }
 
-function getFavoriteCities() {
-    return JSON.parse(localStorage.getItem('favoriteCities'))
+function getFavouriteCities() {
+    const jsonFavouriteCities = JSON.parse(localStorage.getItem('favouriteCities'))
+    const favouriteCities = jsonFavouriteCities? jsonFavouriteCities : [];
+    return favouriteCities;
 }
 
-export default {setCurrentCity, setFavoriteCities, getFavoriteCities, getCurrentCity}
+
+const defaultCityName = 'Dubai';
+const currentCity = getCurrentCity() ? getCurrentCity() : defaultCityName;
+
+export default {setCurrentCity, setFavouriteCities, getFavouriteCities, currentCity}
