@@ -126,16 +126,16 @@ function cityForecasts(cityForecastData) {
     removeForecasts();
     const forecasts = cityForecastData.list
     const n = 0
-    forecastCreator(forecasts, n)
+    forecastIterate(forecasts, n)
 }
 
-function forecastCreator(forecasts, n) {
+function forecastIterate(forecasts, n) {
         const forecastData = new constructors.ForecastData(forecasts[n]);
         const forecast = createForecast(forecastData)
         UI.FORECASTS.append(forecast);
         n++
     if (n < forecasts.length) {
-        forecastCreator(forecasts, n)
+        forecastIterate(forecasts, n)
     }
 }
 
