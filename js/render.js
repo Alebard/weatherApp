@@ -5,6 +5,24 @@ import {UI} from './view.js';
 import storage from "./storage.js";
 import constructors from "./constructors.js";
 
+function favouritesList() {
+    UI.LOCATIONS_LIST.innerHTML = '';
+    const favouriteCities = storage.getFavouriteCities()
+    favouriteCities.forEach((item) => {
+        let newLocation = document.createElement('div');
+        newLocation.className = 'list_item';
+        newLocation.innerHTML = `<span class="list_title">${item}</span>`;
+        let closeLocation = document.createElement('span');
+        closeLocation.className = 'list_close'
+        closeLocation.innerHTML = '&#10006';
+        list_items.append(newLocation);
+        newLocation.append(closeLocation)
+        UI.FORM.reset();
+        newLocation.addEventListener('click', viewWeather)
+        closeLocation.addEventListener('click', deleteLocation)
+    })
+}
+
 async function cityWeather(cityName) {
     const cityWeatherData = await data.getData(cityName, 'weather')
     const cityForecastData = await data.getData(cityName, 'forecast')
@@ -87,7 +105,6 @@ function dateLengthCheck(checkDate) {
 }
 
 
-
 function viewWeather(event) {
     const clickTarget = event.target
     if (clickTarget.classList.contains('list_title')) {
@@ -107,13 +124,41 @@ function deleteLocation(event) {
 
 function cityForecasts(cityForecastData) {
     removeForecasts();
-    const forecasts = cityForecastData.list;
-    forecasts.forEach(function (item) {
-        const forecast = new constructors.CreateForecast(item);
-        UI.FORECASTS.append(forecast);
-    })
+    const forecasts = cityForecastData.list
+    const n = 0
+    forecastCreator(forecasts, n)
 }
 
+function forecastCreator(forecasts, n) {
+        const forecastData = new constructors.ForecastData(forecasts[n]);
+        const forecast = createForecast(forecastData)
+        UI.FORECASTS.append(forecast);
+        n++
+    if (n < forecasts.length) {
+        forecastCreator(forecasts, n)
+    }
+}
+
+
+function createForecast(data) {
+    const forecast = document.createElement('div');
+    forecast.className = 'forecast_item';
+    forecast.innerHTML = `<div class="forecast_date-and-time">
+            <div class="forecast_date">${data.weatherDay} ${data.weatherMonth}</div>
+            <div class="forecast_time">${data.weatherHour}:${data.weatherMinutes}</div>
+        </div>
+        <div class="forecast_info">
+            <div class="forecast_param">
+                <div>Temperature: <span class="weather_temp parameters_temp">${data.temp}°</span></div>
+                <div>Feels like: <span class="parameters_feels-like">${data.feelsLike}°</span></div>
+            </div>
+            <div class="forecast_status">
+                <span class="parameters_weather">${data.weatherStatus}</span>
+                <div class="weather_img forecast_weather__image" style="background-image: url(https://openweathermap.org/img/wn/${data.weatherIcon}@4x.png)"></div>
+            </div>
+        </div>`
+    return forecast
+}
 
 
 function removeForecasts() {
@@ -121,4 +166,4 @@ function removeForecasts() {
 }
 
 
-export default {cityWeather, deleteLocation, viewWeather, timeConvert};
+export default {cityWeather, deleteLocation, viewWeather, timeConvert, favouritesList};

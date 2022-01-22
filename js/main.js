@@ -8,8 +8,8 @@ import tabs from './tabs.js'
 import constructors from "./constructors.js";
 
 
+render.favouritesList();
 render.cityWeather(storage.getCurrentCity());
-const favouritsCitiesList = new constructors.FavouritesList();
 
 UI.ADD_TO_FAVORITES_BTN.addEventListener('click', favouriteCities.addFavouriteCity);
 
